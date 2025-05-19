@@ -1,0 +1,15 @@
+#!/data/data/com.termux/files/usr/bin/bash
+
+# Ask user for city
+echo -ne "\033[1;36mEnter your city name (e.g. Nairobi): \033[0m"
+read CITY
+
+# Check if city is empty
+[ -z "$CITY" ] && echo -e "\033[1;31mNo city entered. Exiting.\033[0m" && exit 1
+
+# Fetch 3-day weather forecast
+echo -e "\n\033[1;33mFetching weather for $CITY...\033[0m"
+curl -s "wttr.in/${CITY}?format=3"
+
+echo -e "\n\033[1;34m3-Day Forecast:\033[0m"
+curl -s "wttr.in/${CITY}?m&3"

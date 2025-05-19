@@ -1,0 +1,96 @@
+#!/data/data/com.termux/files/usr/bin/bash
+
+# Colors
+YELLOW='\033[1;33m'
+GREEN='\033[0;32m'
+CYAN='\033[1;36m'
+RED='\033[0;31m'
+NC='\033[0m'
+
+CONTACT_FILE="$HOME/.whatsapp_contacts"
+touch "$CONTACT_FILE"
+
+# Load contacts
+declare -A contacts
+while IFS='=' read -r name number; do
+  if [ -n "$name" ] && [ -n "$number" ]; then
+    contacts["$name"]="$number"
+  fi
+done < "$CONTACT_FILE"
+
+# Display header
+echo -e "${GREEN}"
+echo "╔═══════════════════════════════════════╗"
+echo "║        WHATSAPP SMART SENDER         ║"
+echo "╚═══════════════════════════════════════╝"
+echo -e "${NC}"
+
+# Display contact menu
+echo -e "${CYAN}📇 Select a contact or action:${NC}"
+i=1
+for name in "${!contacts[@]}"; do
+  echo -e "${YELLOW} $i) $name (${contacts[$name]}) ${NC}"
+  contact_keys[$i]=$name
+  ((i++))
+done
+
+manual=$i; echo -e "${YELLOW} $manual) Enter number manually ${NC}"; ((i++))
+message_only=$i; echo -e "${YELLOW} $message_only) Send message only (no number) ${NC}"; ((i++))
+add_contact=$i; echo -e "${YELLOW} $add_contact) Add new contact ${NC}"; ((i++))
+edit_contact=$i; echo -e "${YELLOW} $edit_contact) Edit existing contact ${NC}"; ((i++))
+delete_contact=$i; echo -e "${YELLOW} $delete_contact) Delete contact ${NC}"; ((i++))
+
+read -e -p "$(echo -e "${CYAN}➡️  Enter your choice: ${NC}")" choice
+
+if [[ "$choice" -eq "$manual" ]]; then
+  read -e -p "$(echo -e "${CYAN}📞 Enter phone number: ${NC}")" NUMBER
+
+elif [[ "$choice" -eq "$message_only" ]]; then
+  NUMBER=""
+
+elif [[ "$choice" -eq "$add_contact" ]]; then
+  read -e -p "$(echo -e "${CYAN}📛 Enter contact name: ${NC}")" new_name
+  read -e -p "$(echo -e "${CYAN}📞 Enter phone number: ${NC}")" new_number
+  echo "$new_name=$new_number" >> "$CONTACT_FILE"
+  echo -e "${GREEN}✅ Contact '$new_name' saved!${NC}"
+  exit 0
+
+elif [[ "$choice" -eq "$edit_contact" ]]; then
+  read -e -p "$(echo -e "${CYAN}✏️  Enter name of contact to edit: ${NC}")" target
+  grep -q "^$target=" "$CONTACT_FILE"
+  if [ $? -ne 0 ]; then
+    echo -e "${RED}❌ Contact not found.${NC}"
+    exit 1
+  fi
+  read -e -p "$(echo -e "${CYAN}📞 Enter new number for $target: ${NC}")" new_number
+  sed -i "s/^$target=.*/$target=$new_number/" "$CONTACT_FILE"
+  echo -e "${GREEN}✅ Contact '$target' updated.${NC}"
+  exit 0
+
+elif [[ "$choice" -eq "$delete_contact" ]]; then
+  read -e -p "$(echo -e "${CYAN}🗑️  Enter name of contact to delete: ${NC}")" target
+  grep -q "^$target=" "$CONTACT_FILE"
+  if [ $? -ne 0 ]; then
+    echo -e "${RED}❌ Contact not found.${NC}"
+    exit 1
+  fi
+  sed -i "/^$target=/d" "$CONTACT_FILE"
+  echo -e "${GREEN}✅ Contact '$target' deleted.${NC}"
+  exit 0
+
+else
+  NAME="${contact_keys[$choice]}"
+  NUMBER="${contacts[$NAME]}"
+fi
+
+read -e -p "$(echo -e "${CYAN}💬 Enter message: ${NC}")" MESSAGE
+ENCODED_MSG=$(echo "$MESSAGE" | sed 's/ /%20/g')
+
+# Launch WhatsApp
+if [ -z "$NUMBER" ]; then
+  am start -a android.intent.action.VIEW -d "https://wa.me/?text=$ENCODED_MSG"
+else
+  am start -a android.intent.action.VIEW -d "https://wa.me/$NUMBER?text=$ENCODED_MSG"
+fi
+
+echo -e "${GREEN}✅ Message loaded in WhatsApp.${NC}"

@@ -1,0 +1,25 @@
+[safe]
+	directory = /storage/emulated/0/recipe1
+	directory = /storage/emulated/0/IYF/My-Portfolio
+	directory = /storage/emulated/0/documents/Eulogy
+	directory = /storage/emulated/0/documents/EULOGY
+	directory = /storage/emulated/0/documents/eulogy
+	directory = /storage/emulated/0/documents/IYF/7May
+	directory = /storage/emulated/0/documents/iyf/7may
+	directory = /storage/emulated/0/documents/IYF/My-Portfolio
+	directory = /storage/emulated/0/documents/iyf/My-Portfolio
+	directory = /storage/emulated/0/documents/iyf/followers
+	directory = /storage/emulated/0/documents/IYF/followers
+	directory = /storage/emulated/0/Documents/IYF/followers
+	directory = /storage/emulated/0/GitHub
+	directory = /storage/emulated/0/documents/iyf/Final_Project
+	directory = /storage/emulated/0/documents/iyf/Final_Project
+	directory = /storage/emulated/0/documents/iyf/Final_Project
+	directory = /storage/emulated/0/documents/iyf/Final_Project
+	directory = /storage/emulated/0/documents/iyf/Final_Project
+	directory = *
+[user]
+	email = raphachegekamunu@gmail.com
+	name = raphachegeke
+[http]
+	postBuffer = 524288000
